@@ -55,7 +55,7 @@ class LoginActivity : AppCompatActivity() {
             conn.outputStream.use { it.write("{\"username\":\"$username\"}".toByteArray()) }
             if (conn.responseCode != 200) return null
             val body = conn.inputStream.bufferedReader().readText()
-            val token = Regex("\"token\"\s*:\"([^\"]+)\"").find(body)?.groupValues?.get(1)
+            val token = Regex("\\\"token\\\"\\s*:\\"([^\\\"]+)\\\"").find(body)?.groupValues?.get(1)
             token
         } catch (e: Exception) {
             null
