@@ -25,7 +25,7 @@ class LoginActivity : AppCompatActivity() {
 
         findViewById<android.widget.Button>(R.id.login).setOnClickListener {
             Thread {
-                val ok = login(username.text.toString(), password.text.toString())
+                val ok = login(username.text.toString().trim(), password.text.toString().trim())
                 runOnUiThread {
                     if (ok) startActivity(Intent(this, ChatListActivity::class.java))
                     else Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
@@ -35,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
 
         findViewById<android.widget.TextView>(R.id.register).setOnClickListener {
             Thread {
-                val (token, err) = register(username.text.toString())
+                val (token, err) = register(username.text.toString().trim())
                 runOnUiThread {
                     if (token != null) {
                         password.setText(token)
