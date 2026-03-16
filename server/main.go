@@ -30,6 +30,7 @@ type LoginReq struct {
 var (
 	usersMu sync.Mutex
 	users   = make(map[string]User)
+	keys    = NewKeyStore()
 )
 
 func newToken() string {
@@ -84,6 +85,35 @@ func main() {
 			return
 		}
 		w.WriteHeader(http.StatusOK)
+	})
+
+	mux.HandleFunc("/keys/upload", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		var b KeyBundle
+		_ = json.NewDecoder(r.Body).Decode(&b)
+		if b.Username == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		keys.Put(b)
+		w.WriteHeader(http.StatusOK)
+	})
+
+	mux.HandleFunc("/keys/get", func(w http.ResponseWriter, r *http.Request) {
+		user := r.URL.Query().Get("u")
+		if user == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if b, ok := keys.Get(user); ok {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(b)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
 	})
 
 	log.Println("Signalix server on :3002")

@@ -6,6 +6,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.signalix.app.R
+import com.signalix.app.data.Prefs
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -15,6 +16,8 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        applyPalette()
 
         val username = findViewById<EditText>(R.id.username)
         val password = findViewById<EditText>(R.id.password)
@@ -31,21 +34,21 @@ class LoginActivity : AppCompatActivity() {
 
         findViewById<android.widget.TextView>(R.id.register).setOnClickListener {
             Thread {
-                val token = register(username.text.toString())
+                val (token, err) = register(username.text.toString())
                 runOnUiThread {
                     if (token != null) {
                         password.setText(token)
                         Toast.makeText(this, "Token generated", Toast.LENGTH_SHORT).show()
                     } else {
-                        Toast.makeText(this, "Register failed", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, err ?: "Register failed", Toast.LENGTH_SHORT).show()
                     }
                 }
             }.start()
         }
     }
 
-    private fun register(username: String): String? {
-        if (username.isBlank()) return null
+    private fun register(username: String): Pair<String?, String?> {
+        if (username.isBlank()) return null to "Username required"
         return try {
             val url = URL("$baseUrl/register")
             val conn = url.openConnection() as HttpURLConnection
@@ -53,12 +56,14 @@ class LoginActivity : AppCompatActivity() {
             conn.setRequestProperty("Content-Type", "application/json")
             conn.doOutput = true
             conn.outputStream.use { it.write("{\"username\":\"$username\"}".toByteArray()) }
-            if (conn.responseCode != 200) return null
+            val code = conn.responseCode
+            if (code == 409) return null to "Username already taken"
+            if (code != 200) return null to "Server error ($code)"
             val body = conn.inputStream.bufferedReader().readText()
             val token = Regex("\\\"token\\\"\\s*:\\\"([^\\\"]+)\\\"").find(body)?.groupValues?.get(1)
-            token
+            token to null
         } catch (e: Exception) {
-            null
+            null to "Network error"
         }
     }
 
@@ -74,6 +79,13 @@ class LoginActivity : AppCompatActivity() {
             conn.responseCode == 200
         } catch (e: Exception) {
             false
+        }
+    }
+
+    private fun applyPalette() {
+        val palette = Prefs.getPalette(this)
+        if (palette == "alt") {
+            setTheme(androidx.appcompat.R.style.ThemeOverlay_AppCompat_Dark)
         }
     }
 }

@@ -3,5 +3,7 @@
     <style name="Theme.Signalix" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="colorPrimary">@color/palette_primary</item>
+        <item name="colorSecondary">@color/palette_secondary</item>
     </style>
 </resources>
