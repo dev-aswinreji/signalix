@@ -24,8 +24,14 @@ class LoginActivity : AppCompatActivity() {
         val password = findViewById<EditText>(R.id.password)
 
         findViewById<android.widget.Button>(R.id.login).setOnClickListener {
+            val u = username.text.toString().trim()
+            val p = password.text.toString().trim()
+            if (u.isBlank()) {
+                username.error = "Username required"
+                return@setOnClickListener
+            }
             Thread {
-                val ok = login(username.text.toString().trim(), password.text.toString().trim())
+                val ok = login(u, p)
                 runOnUiThread {
                     if (ok) startActivity(Intent(this, ChatListActivity::class.java))
                     else Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
@@ -34,8 +40,13 @@ class LoginActivity : AppCompatActivity() {
         }
 
         findViewById<android.widget.TextView>(R.id.register).setOnClickListener {
+            val u = username.text.toString().trim()
+            if (u.isBlank()) {
+                username.error = "Username required"
+                return@setOnClickListener
+            }
             Thread {
-                val (token, err) = register(username.text.toString().trim())
+                val (token, err) = register(u)
                 runOnUiThread {
                     if (token != null) {
                         password.setText(token)
@@ -49,7 +60,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun register(username: String): Pair<String?, String?> {
-        if (username.isBlank()) return null to "Username required"
         return try {
             val url = URL("$baseUrl/register")
             val conn = url.openConnection() as HttpURLConnection
