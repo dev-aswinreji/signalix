@@ -28,5 +28,12 @@ class SettingsActivity : AppCompatActivity() {
                 }
                 .show()
         }
+
+        val server = findViewById<android.widget.EditText>(R.id.server_url)
+        server.setText(Prefs.getServer(this))
+        findViewById<android.widget.Button>(R.id.save_server).setOnClickListener {
+            Prefs.setServer(this, server.text.toString())
+            android.widget.Toast.makeText(this, "Server saved", android.widget.Toast.LENGTH_SHORT).show()
+        }
     }
 }

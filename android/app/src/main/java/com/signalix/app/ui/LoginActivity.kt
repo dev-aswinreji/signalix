@@ -11,7 +11,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class LoginActivity : AppCompatActivity() {
-    private val baseUrl = "http://10.0.2.2:3002"
+    private val baseUrl: String
+        get() = com.signalix.app.data.Prefs.getServer(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
