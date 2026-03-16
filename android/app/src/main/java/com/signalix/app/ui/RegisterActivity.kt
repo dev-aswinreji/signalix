@@ -21,11 +21,22 @@ class RegisterActivity : AppCompatActivity() {
 
         val username = findViewById<EditText>(R.id.username)
         val tokenView = findViewById<TextView>(R.id.token)
+        val generate = findViewById<android.widget.Button>(R.id.generate)
 
-        findViewById<android.widget.Button>(R.id.generate).setOnClickListener {
+        generate.isEnabled = false
+        username.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val u = s?.toString()?.trim().orEmpty()
+                generate.isEnabled = u.length in 3..20 && u.matches(Regex("[a-zA-Z0-9_]+"))
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+
+        generate.setOnClickListener {
             val u = username.text.toString().trim()
-            if (u.isBlank()) {
-                username.error = "Username required"
+            if (!(u.length in 3..20 && u.matches(Regex("[a-zA-Z0-9_]+")))) {
+                username.error = "Use 3–20 letters/numbers/underscore"
                 return@setOnClickListener
             }
             Thread {
