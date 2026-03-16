@@ -22,6 +22,14 @@ class LoginActivity : AppCompatActivity() {
 
         val username = findViewById<EditText>(R.id.username)
         val password = findViewById<EditText>(R.id.password)
+        val remember = findViewById<android.widget.CheckBox>(R.id.remember)
+
+        val (remembered, userSaved, tokenSaved) = com.signalix.app.data.Prefs.getRemember(this)
+        if (remembered) {
+            username.setText(userSaved)
+            password.setText(tokenSaved)
+            remember.isChecked = true
+        }
 
         findViewById<android.widget.Button>(R.id.login).setOnClickListener {
             val u = username.text.toString().trim()
@@ -33,29 +41,18 @@ class LoginActivity : AppCompatActivity() {
             Thread {
                 val ok = login(u, p)
                 runOnUiThread {
-                    if (ok) startActivity(Intent(this, ChatListActivity::class.java))
-                    else Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
+                    if (ok) {
+                        com.signalix.app.data.Prefs.setRemember(this, remember.isChecked, u, p)
+                        startActivity(Intent(this, ChatListActivity::class.java))
+                    } else {
+                        Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }.start()
         }
 
-        findViewById<android.widget.TextView>(R.id.register).setOnClickListener {
-            val u = username.text.toString().trim()
-            if (u.isBlank()) {
-                username.error = "Username required"
-                return@setOnClickListener
-            }
-            Thread {
-                val (token, err) = register(u)
-                runOnUiThread {
-                    if (token != null) {
-                        password.setText(token)
-                        Toast.makeText(this, "Token generated", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(this, err ?: "Register failed", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }.start()
+        findViewById<android.widget.Button>(R.id.register).setOnClickListener {
+            startActivity(Intent(this, RegisterActivity::class.java))
         }
     }
 

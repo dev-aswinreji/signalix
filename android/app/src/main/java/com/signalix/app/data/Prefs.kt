@@ -7,6 +7,9 @@ object Prefs {
     private const val KEY_THEME = "theme"
     private const val KEY_PALETTE = "palette"
     private const val KEY_SERVER = "server"
+    private const val KEY_REMEMBER = "remember"
+    private const val KEY_USER = "user"
+    private const val KEY_TOKEN = "token"
 
     fun setTheme(context: Context, dark: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -35,4 +38,21 @@ object Prefs {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .getString(KEY_SERVER, "https://signalix-backend.onrender.com")
             ?: "https://signalix-backend.onrender.com"
+
+    fun setRemember(context: Context, remember: Boolean, user: String, token: String) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_REMEMBER, remember)
+            .putString(KEY_USER, user)
+            .putString(KEY_TOKEN, token)
+            .apply()
+    }
+
+    fun getRemember(context: Context): Triple<Boolean, String, String> {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val remember = prefs.getBoolean(KEY_REMEMBER, false)
+        val user = prefs.getString(KEY_USER, "") ?: ""
+        val token = prefs.getString(KEY_TOKEN, "") ?: ""
+        return Triple(remember, user, token)
+    }
 }

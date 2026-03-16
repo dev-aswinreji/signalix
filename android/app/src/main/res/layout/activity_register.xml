@@ -8,8 +8,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Signalix"
-        android:textSize="28sp"
+        android:text="Create account"
+        android:textSize="22sp"
         android:textStyle="bold" />
 
     <EditText
@@ -19,33 +19,32 @@
         android:hint="Username"
         android:layout_marginTop="16dp" />
 
-    <EditText
-        android:id="@+id/password"
+    <Button
+        android:id="@+id/generate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Generate UUID token"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#6B7280" />
+
+    <TextView
+        android:id="@+id/token"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Token (UUID)"
+        android:text="Token will appear here"
         android:layout_marginTop="12dp" />
 
-    <CheckBox
-        android:id="@+id/remember"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/warning"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Remember sign‑in"
-        android:layout_marginTop="8dp" />
+        android:text="Important: Store this token safely. If you lose it, recovery is not possible."
+        android:layout_marginTop="12dp" />
 
     <Button
-        android:id="@+id/login"
+        android:id="@+id/continue_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="#4B5563" />
-
-    <Button
-        android:id="@+id/register"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Create account"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="#6B7280" />
+        android:text="Continue to login"
+        android:layout_marginTop="16dp" />
 </LinearLayout>
