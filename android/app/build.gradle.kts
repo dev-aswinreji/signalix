@@ -11,8 +11,8 @@ android {
         applicationId = "com.signalix.app"
         minSdk = 35
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.0.1"
+        versionCode = 4
+        versionName = "1.1.0"
     }
 
     buildTypes {
