@@ -14,8 +14,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            app:title="Chats"
-            app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
+            app:title=""
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -68,7 +67,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="Search friends"
+                    android:hint=""
                     android:visibility="gone" />
 
                 <ImageButton
@@ -97,7 +96,7 @@
             android:id="@+id/placeholder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No chats yet"
+            android:text="No chats"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
             app:layout_constraintTop_toBottomOf="@id/search_bar"
             app:layout_constraintStart_toStartOf="parent"
@@ -111,7 +110,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:text="New chat"
+        android:text=""
         app:icon="@drawable/ic_send" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
