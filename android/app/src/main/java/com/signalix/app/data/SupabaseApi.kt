@@ -18,6 +18,11 @@ object SupabaseApi {
         return if (body.contains("\"username\"")) body else null
     }
 
+    fun searchUsers(prefix: String): String {
+        val c = conn("${Supabase.URL}/rest/v1/users?username=ilike.${prefix}%")
+        return c.inputStream.bufferedReader().readText()
+    }
+
     fun addContact(owner: String, contact: String): Boolean {
         val c = conn("${Supabase.URL}/rest/v1/contacts")
         c.requestMethod = "POST"

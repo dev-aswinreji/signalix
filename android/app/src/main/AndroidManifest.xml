@@ -18,5 +18,7 @@
         <activity android:name=".ui.SettingsActivity" android:exported="false" />
         <activity android:name=".ui.RegisterActivity" android:exported="false" />
         <activity android:name=".ui.ChatActivity" android:exported="false" />
+        <activity android:name=".ui.SearchActivity" android:exported="false" />
+        <activity android:name=".ui.ProfileActivity" android:exported="false" />
     </application>
 </manifest>
