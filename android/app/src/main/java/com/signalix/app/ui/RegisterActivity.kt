@@ -24,6 +24,7 @@ class RegisterActivity : AppCompatActivity() {
         val username = findViewById<EditText>(R.id.username)
         val tokenView = findViewById<TextView>(R.id.token)
         val generate = findViewById<android.widget.Button>(R.id.generate)
+        val copy = findViewById<android.widget.Button>(R.id.copy)
 
         generate.isEnabled = false
         username.addTextChangedListener(object : android.text.TextWatcher {
@@ -52,6 +53,15 @@ class RegisterActivity : AppCompatActivity() {
                     }
                 }
             }.start()
+        }
+
+        copy.setOnClickListener {
+            val text = tokenView.text.toString()
+            if (text.isNotBlank() && !text.contains("Token will")) {
+                val clipboard = getSystemService(android.content.ClipboardManager::class.java)
+                clipboard.setPrimaryClip(android.content.ClipData.newPlainText("token", text))
+                Toast.makeText(this, "Copied", Toast.LENGTH_SHORT).show()
+            }
         }
 
         findViewById<android.widget.Button>(R.id.continue_login).setOnClickListener {
