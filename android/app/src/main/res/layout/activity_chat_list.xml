@@ -28,6 +28,14 @@
                 android:backgroundTint="@color/surface_container" />
 
             <ImageButton
+                android:id="@+id/search_toggle"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_search"
+                android:contentDescription="Search"
+                android:backgroundTint="@color/surface_container" />
+
+            <ImageButton
                 android:id="@+id/menu"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -54,30 +62,12 @@
                 android:gravity="center_vertical"
                 android:padding="8dp">
 
-                <ImageButton
-                    android:id="@+id/search_toggle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/ic_search"
-                    android:contentDescription="Search"
-                    android:backgroundTint="@color/surface_container" />
-
                 <EditText
                     android:id="@+id/search"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint=""
+                    android:hint="Search"
                     android:visibility="gone" />
-
-                <ImageButton
-                    android:id="@+id/add_contact"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/ic_send"
-                    android:contentDescription="New chat"
-                    android:layout_marginStart="8dp"
-                    android:backgroundTint="@color/surface_container" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -112,6 +102,6 @@
         android:layout_margin="16dp"
         android:text=""
         android:textColor="@color/button_text"
-        app:icon="@drawable/ic_send" />
+        app:icon="@drawable/ic_search" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

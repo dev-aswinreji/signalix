@@ -41,10 +41,6 @@ class ChatListActivity : AppCompatActivity() {
             search.visibility = if (search.visibility == android.view.View.GONE) android.view.View.VISIBLE else android.view.View.GONE
         }
 
-        findViewById<android.widget.ImageButton>(R.id.add_contact).setOnClickListener {
-            startActivity(Intent(this, SearchActivity::class.java))
-        }
-
         findViewById<com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton>(R.id.new_chat_fab).setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
         }
