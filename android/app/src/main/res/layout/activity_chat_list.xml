@@ -29,21 +29,21 @@
                 android:layout_gravity="start" />
 
             <ImageButton
-                android:id="@+id/search_toggle"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_search"
-                android:contentDescription="Search"
-                android:backgroundTint="@color/surface_container"
-                android:layout_gravity="end"
-                android:layout_marginEnd="8dp" />
-
-            <ImageButton
                 android:id="@+id/menu"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:src="@drawable/ic_more"
                 android:contentDescription="Menu"
+                android:backgroundTint="@color/surface_container"
+                android:layout_gravity="end"
+                android:layout_marginEnd="8dp" />
+
+            <ImageButton
+                android:id="@+id/search_toggle"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_search"
+                android:contentDescription="Search"
                 android:backgroundTint="@color/surface_container"
                 android:layout_gravity="end" />
         </com.google.android.material.appbar.MaterialToolbar>
