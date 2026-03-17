@@ -23,6 +23,11 @@ class ChatActivity : AppCompatActivity() {
 
         peer = intent.getStringExtra("peer") ?: ""
         findViewById<TextView>(R.id.title).text = peer
+        findViewById<android.widget.ImageButton>(R.id.profile).setOnClickListener {
+            val intent = android.content.Intent(this, ProfileActivity::class.java)
+            intent.putExtra("user", Prefs.getCurrentUser(this))
+            startActivity(intent)
+        }
         messages = findViewById(R.id.messages)
         input = findViewById(R.id.input)
 

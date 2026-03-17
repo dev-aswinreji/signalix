@@ -21,6 +21,13 @@
         android:textSize="20sp"
         android:layout_marginTop="12dp" />
 
+    <EditText
+        android:id="@+id/bio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Bio"
+        android:layout_marginTop="12dp" />
+
     <ImageButton
         android:id="@+id/request"
         android:layout_width="48dp"
@@ -29,4 +36,11 @@
         android:src="@drawable/ic_send"
         android:contentDescription="Send request"
         android:backgroundTint="#2A2F3B" />
+
+    <Button
+        android:id="@+id/save_bio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save bio"
+        android:layout_marginTop="12dp" />
 </LinearLayout>

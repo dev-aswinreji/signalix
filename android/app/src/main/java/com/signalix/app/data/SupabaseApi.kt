@@ -57,6 +57,14 @@ object SupabaseApi {
         return c.responseCode in 200..299
     }
 
+    fun updateBio(username: String, bio: String): Boolean {
+        val c = conn("${Supabase.URL}/rest/v1/users?username=eq.$username")
+        c.requestMethod = "PATCH"
+        c.doOutput = true
+        c.outputStream.use { it.write("{\"bio\":\"$bio\"}".toByteArray()) }
+        return c.responseCode in 200..299
+    }
+
     fun sendMessage(sender: String, receiver: String, body: String): Boolean {
         val c = conn("${Supabase.URL}/rest/v1/messages")
         c.requestMethod = "POST"

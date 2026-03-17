@@ -18,6 +18,14 @@ class ProfileActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.username).text = "@$user"
         findViewById<TextView>(R.id.avatar).text = user.first().uppercase()
 
+        val bio = findViewById<android.widget.EditText>(R.id.bio)
+        findViewById<android.widget.Button>(R.id.save_bio).setOnClickListener {
+            val text = bio.text.toString()
+            Thread {
+                SupabaseApi.updateBio(user, text)
+            }.start()
+        }
+
         findViewById<android.widget.ImageButton>(R.id.request).setOnClickListener {
             Thread {
                 SupabaseApi.sendRequest(Prefs.getCurrentUser(this), user)
