@@ -9,6 +9,8 @@ class ChatListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_list)
+        applyInsets(findViewById(android.R.id.content))
+        applyFullscreen(this)
 
         val list = findViewById<android.widget.LinearLayout>(R.id.chat_list)
         val placeholder = findViewById<android.widget.TextView>(R.id.placeholder)
@@ -27,14 +29,14 @@ class ChatListActivity : AppCompatActivity() {
             val input = android.widget.EditText(this)
             input.hint = "username"
             android.app.AlertDialog.Builder(this)
-                .setTitle("Add contact")
+                .setTitle("Send request")
                 .setView(input)
-                .setPositiveButton("Add") { _, _ ->
+                .setPositiveButton("Send") { _, _ ->
                     val u = input.text.toString().trim()
                     if (u.isNotBlank()) {
                         Thread {
                             val me = com.signalix.app.data.Prefs.getCurrentUser(this)
-                            com.signalix.app.data.SupabaseApi.addContact(me, u)
+                            com.signalix.app.data.SupabaseApi.sendRequest(me, u)
                             runOnUiThread { loadContacts(list, placeholder) }
                         }.start()
                     }
@@ -44,6 +46,7 @@ class ChatListActivity : AppCompatActivity() {
         }
 
         loadContacts(list, placeholder)
+        loadRequests(list)
     }
 
     private fun loadContacts(list: android.widget.LinearLayout, placeholder: android.widget.TextView) {
@@ -71,6 +74,34 @@ class ChatListActivity : AppCompatActivity() {
                         }
                         list.addView(tv)
                     }
+                }
+            }
+        }.start()
+    }
+
+    private fun loadRequests(list: android.widget.LinearLayout) {
+        Thread {
+            val me = com.signalix.app.data.Prefs.getCurrentUser(this)
+            val body = com.signalix.app.data.SupabaseApi.listRequests(me)
+            val ids = Regex("\\\"id\\\"\\s*:\\\"([^\\\"]+)\\\"")
+                .findAll(body).map { it.groupValues[1] }.toList()
+            val senders = Regex("\\\"sender\\\"\\s*:\\\"([^\\\"]+)\\\"")
+                .findAll(body).map { it.groupValues[1] }.toList()
+            runOnUiThread {
+                ids.zip(senders).forEach { (id, sender) ->
+                    val tv = android.widget.TextView(this)
+                    tv.text = "Request from $sender (tap to accept)"
+                    tv.setPadding(0, 8, 0, 8)
+                    tv.setOnClickListener {
+                        Thread {
+                            com.signalix.app.data.SupabaseApi.acceptRequest(id)
+                            com.signalix.app.data.SupabaseApi.addContact(me, sender)
+                            runOnUiThread {
+                                loadContacts(list, findViewById(R.id.placeholder))
+                            }
+                        }.start()
+                    }
+                    list.addView(tv)
                 }
             }
         }.start()

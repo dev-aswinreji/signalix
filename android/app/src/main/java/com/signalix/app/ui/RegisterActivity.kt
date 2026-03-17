@@ -20,6 +20,8 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+        applyInsets(findViewById(android.R.id.content))
+        applyFullscreen(this)
 
         val username = findViewById<EditText>(R.id.username)
         val tokenView = findViewById<TextView>(R.id.token)

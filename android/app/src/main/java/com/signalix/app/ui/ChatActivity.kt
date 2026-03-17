@@ -18,6 +18,8 @@ class ChatActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
+        applyInsets(findViewById(android.R.id.content))
+        applyFullscreen(this)
 
         peer = intent.getStringExtra("peer") ?: ""
         findViewById<TextView>(R.id.title).text = peer

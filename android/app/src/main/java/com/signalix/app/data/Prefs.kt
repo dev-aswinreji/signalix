@@ -11,6 +11,7 @@ object Prefs {
     private const val KEY_USER = "user"
     private const val KEY_TOKEN = "token"
     private const val KEY_CURRENT = "current_user"
+    private const val KEY_FULLSCREEN = "fullscreen"
 
     fun setTheme(context: Context, dark: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -65,4 +66,13 @@ object Prefs {
     fun getCurrentUser(context: Context): String =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .getString(KEY_CURRENT, "") ?: ""
+
+    fun setFullscreen(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_FULLSCREEN, enabled).apply()
+    }
+
+    fun isFullscreen(context: Context): Boolean =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getBoolean(KEY_FULLSCREEN, false)
 }

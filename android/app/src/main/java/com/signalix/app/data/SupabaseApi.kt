@@ -31,6 +31,27 @@ object SupabaseApi {
         return c.inputStream.bufferedReader().readText()
     }
 
+    fun sendRequest(sender: String, receiver: String): Boolean {
+        val c = conn("${Supabase.URL}/rest/v1/requests")
+        c.requestMethod = "POST"
+        c.doOutput = true
+        c.outputStream.use { it.write("{\"sender\":\"$sender\",\"receiver\":\"$receiver\",\"status\":\"pending\"}".toByteArray()) }
+        return c.responseCode in 200..299
+    }
+
+    fun listRequests(user: String): String {
+        val c = conn("${Supabase.URL}/rest/v1/requests?receiver=eq.$user&status=eq.pending")
+        return c.inputStream.bufferedReader().readText()
+    }
+
+    fun acceptRequest(id: String): Boolean {
+        val c = conn("${Supabase.URL}/rest/v1/requests?id=eq.$id")
+        c.requestMethod = "PATCH"
+        c.doOutput = true
+        c.outputStream.use { it.write("{\"status\":\"accepted\"}".toByteArray()) }
+        return c.responseCode in 200..299
+    }
+
     fun sendMessage(sender: String, receiver: String, body: String): Boolean {
         val c = conn("${Supabase.URL}/rest/v1/messages")
         c.requestMethod = "POST"
