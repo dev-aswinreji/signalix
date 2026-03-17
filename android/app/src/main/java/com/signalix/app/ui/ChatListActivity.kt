@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.signalix.app.R
 
 class ChatListActivity : AppCompatActivity() {
+    private val contactsCache = mutableListOf<String>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_list)
@@ -38,8 +40,23 @@ class ChatListActivity : AppCompatActivity() {
         }
 
         findViewById<android.widget.ImageButton>(R.id.search_toggle).setOnClickListener {
-            search.visibility = if (search.visibility == android.view.View.GONE) android.view.View.VISIBLE else android.view.View.GONE
+            val nowVisible = search.visibility == android.view.View.GONE
+            search.visibility = if (nowVisible) android.view.View.VISIBLE else android.view.View.GONE
+            if (!nowVisible) {
+                search.setText("")
+                renderContacts(list, placeholder, contactsCache)
+            }
         }
+
+        search.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val q = s?.toString()?.trim().orEmpty().lowercase()
+                val filtered = if (q.isBlank()) contactsCache else contactsCache.filter { it.lowercase().contains(q) }
+                renderContacts(list, placeholder, filtered)
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
 
         findViewById<com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton>(R.id.new_chat_fab).setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
@@ -59,25 +76,35 @@ class ChatListActivity : AppCompatActivity() {
                 .map { it.groupValues[1] }
                 .toList()
             runOnUiThread {
-                list.removeAllViews()
-                if (contacts.isEmpty()) {
-                    placeholder.visibility = android.view.View.VISIBLE
-                } else {
-                    placeholder.visibility = android.view.View.GONE
-                    contacts.forEach { c ->
-                        val row = layoutInflater.inflate(R.layout.item_chat_row, list, false)
-                        row.findViewById<android.widget.TextView>(R.id.name).text = c
-                        row.findViewById<android.widget.TextView>(R.id.avatar).text = c.first().uppercase()
-                        row.setOnClickListener {
-                            val intent = Intent(this, ChatActivity::class.java)
-                            intent.putExtra("peer", c)
-                            startActivity(intent)
-                        }
-                        list.addView(row)
-                    }
-                }
+                contactsCache.clear()
+                contactsCache.addAll(contacts)
+                renderContacts(list, placeholder, contactsCache)
             }
         }.start()
+    }
+
+    private fun renderContacts(
+        list: android.widget.LinearLayout,
+        placeholder: android.widget.TextView,
+        contacts: List<String>
+    ) {
+        list.removeAllViews()
+        if (contacts.isEmpty()) {
+            placeholder.visibility = android.view.View.VISIBLE
+        } else {
+            placeholder.visibility = android.view.View.GONE
+            contacts.forEach { c ->
+                val row = layoutInflater.inflate(R.layout.item_chat_row, list, false)
+                row.findViewById<android.widget.TextView>(R.id.name).text = c
+                row.findViewById<android.widget.TextView>(R.id.avatar).text = c.first().uppercase()
+                row.setOnClickListener {
+                    val intent = Intent(this, ChatActivity::class.java)
+                    intent.putExtra("peer", c)
+                    startActivity(intent)
+                }
+                list.addView(row)
+            }
+        }
     }
 
     private fun loadRequests(list: android.widget.LinearLayout) {

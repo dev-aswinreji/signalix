@@ -19,14 +19,28 @@ class ProfileActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.avatar).text = user.first().uppercase()
 
         val bio = findViewById<android.widget.EditText>(R.id.bio)
-        findViewById<android.widget.Button>(R.id.save_bio).setOnClickListener {
+        val save = findViewById<android.widget.Button>(R.id.save_bio)
+        val request = findViewById<android.widget.ImageButton>(R.id.request)
+
+        val me = Prefs.getCurrentUser(this)
+        if (me == user) {
+            request.visibility = android.view.View.GONE
+        }
+
+        Thread {
+            val found = SupabaseApi.findUser(user)
+            val bioValue = Regex("\\\"bio\\\"\\s*:\\\"([^\\\"]*)\\\"").find(found ?: "")?.groupValues?.get(1)
+            runOnUiThread { if (bioValue != null) bio.setText(bioValue) }
+        }.start()
+
+        save.setOnClickListener {
             val text = bio.text.toString()
             Thread {
                 SupabaseApi.updateBio(user, text)
             }.start()
         }
 
-        findViewById<android.widget.ImageButton>(R.id.request).setOnClickListener {
+        request.setOnClickListener {
             Thread {
                 SupabaseApi.sendRequest(Prefs.getCurrentUser(this), user)
             }.start()

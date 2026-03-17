@@ -14,7 +14,7 @@ object SupabaseApi {
 
     fun findUser(username: String): String? {
         val safe = java.net.URLEncoder.encode(username, "UTF-8")
-        val c = conn("${Supabase.URL}/rest/v1/users?select=username,token&username=eq.$safe")
+        val c = conn("${Supabase.URL}/rest/v1/users?select=username,token,bio&username=eq.$safe")
         return try {
             if (c.responseCode !in 200..299) return null
             val body = c.inputStream.bufferedReader().readText()
