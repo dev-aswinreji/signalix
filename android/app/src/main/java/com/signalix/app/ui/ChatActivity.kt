@@ -47,6 +47,15 @@ class ChatActivity : AppCompatActivity() {
         }
         messages = findViewById(R.id.messages)
         input = findViewById(R.id.input)
+        input.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val user = Prefs.getCurrentUser(this@ChatActivity)
+                val isTyping = !s.isNullOrBlank()
+                Thread { SupabaseApi.setTyping(user, peer, isTyping) }.start()
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
 
         findViewById<android.widget.Button>(R.id.send).setOnClickListener {
             val text = input.text.toString().trim()
@@ -55,6 +64,7 @@ class ChatActivity : AppCompatActivity() {
                 val user = Prefs.getCurrentUser(this)
                 val enc = com.signalix.app.data.SignalManager.encrypt(text, peer)
                 SupabaseApi.sendMessage(user, peer, enc)
+                SupabaseApi.setTyping(user, peer, false)
                 runOnUiThread { input.setText("") }
                 loadMessages()
             }.start()
@@ -80,10 +90,22 @@ class ChatActivity : AppCompatActivity() {
             val currentUser = user
             runOnUiThread {
                 messages.removeAllViews()
-                val pattern = Regex("\\\"sender\\\"\\s*:\\\"([^\\\"]+)\\\"[\\s\\S]*?\\\"body\\\"\\s*:\\\"([^\\\"]+)\\\"")
+                val pattern = Regex("\\\"id\\\"\\s*:\\\"([^\\\"]+)\\\"[\\s\\S]*?\\\"sender\\\"\\s*:\\\"([^\\\"]+)\\\"[\\s\\S]*?\\\"receiver\\\"\\s*:\\\"([^\\\"]+)\\\"[\\s\\S]*?\\\"body\\\"\\s*:\\\"([^\\\"]+)\\\"[\\s\\S]*?\\\"delivered_at\\\"\\s*:\\s*(null|\\\"[^\\\"]*\\\")[\\s\\S]*?\\\"read_at\\\"\\s*:\\s*(null|\\\"[^\\\"]*\\\")")
                 pattern.findAll(body).forEach { m ->
-                    val sender = m.groupValues[1]
-                    val text = com.signalix.app.data.SignalManager.decrypt(m.groupValues[2], peer)
+                    val id = m.groupValues[1]
+                    val sender = m.groupValues[2]
+                    val receiver = m.groupValues[3]
+                    val text = com.signalix.app.data.SignalManager.decrypt(m.groupValues[4], peer)
+                    val deliveredAt = m.groupValues[5]
+                    val readAt = m.groupValues[6]
+
+                    if (receiver == currentUser && deliveredAt == "null") {
+                        Thread { SupabaseApi.markDelivered(id) }.start()
+                    }
+                    if (receiver == currentUser) {
+                        Thread { SupabaseApi.markRead(id) }.start()
+                    }
+
                     val row = layoutInflater.inflate(R.layout.item_message, messages, false)
                     val tv = row.findViewById<TextView>(R.id.text)
                     val status = row.findViewById<TextView>(R.id.status)
@@ -96,7 +118,7 @@ class ChatActivity : AppCompatActivity() {
                         params.gravity = android.view.Gravity.END
                         row.layoutParams = params
                         row.setBackgroundColor(android.graphics.Color.parseColor("#41533B"))
-                        status.text = "✓✓"
+                        status.text = if (readAt != "null") "✓✓" else if (deliveredAt != "null") "✓✓" else "✓"
                     } else {
                         params.gravity = android.view.Gravity.START
                         row.layoutParams = params
@@ -121,8 +143,16 @@ class ChatActivity : AppCompatActivity() {
             channel.subscribe()
             flow.collect {
                 loadMessages()
+                updateTyping()
             }
         }
+    }
+
+    private fun updateTyping() {
+        val me = Prefs.getCurrentUser(this)
+        val typing = SupabaseApi.getTyping(peer, me)
+        val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.chat_toolbar)
+        toolbar.subtitle = if (typing) "typing…" else ""
     }
 
     private fun stopRealtime() {

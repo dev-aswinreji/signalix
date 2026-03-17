@@ -122,8 +122,53 @@ object SupabaseApi {
         val c = conn("${Supabase.URL}/rest/v1/messages")
         c.requestMethod = "POST"
         c.doOutput = true
-        c.outputStream.use { it.write("{\"sender\":\"$sender\",\"receiver\":\"$receiver\",\"body\":\"$body\"}".toByteArray()) }
+        c.outputStream.use { it.write("{\"sender\":\"$sender\",\"receiver\":\"$receiver\",\"body\":\"$body\",\"status\":\"sent\"}".toByteArray()) }
         return c.responseCode in 200..299
+    }
+
+    fun markDelivered(id: String): Boolean {
+        val c = conn("${Supabase.URL}/rest/v1/messages?id=eq.$id")
+        c.requestMethod = "PATCH"
+        c.doOutput = true
+        c.outputStream.use { it.write("{\"delivered_at\":\"now()\",\"status\":\"delivered\"}".toByteArray()) }
+        return c.responseCode in 200..299
+    }
+
+    fun markRead(id: String): Boolean {
+        val c = conn("${Supabase.URL}/rest/v1/messages?id=eq.$id")
+        c.requestMethod = "PATCH"
+        c.doOutput = true
+        c.outputStream.use { it.write("{\"read_at\":\"now()\",\"status\":\"read\"}".toByteArray()) }
+        return c.responseCode in 200..299
+    }
+
+    fun countUnread(receiver: String, sender: String): Int {
+        val c = conn("${Supabase.URL}/rest/v1/messages?receiver=eq.$receiver&sender=eq.$sender&read_at=is.null")
+        return try {
+            val body = c.inputStream.bufferedReader().readText()
+            Regex("\\\"id\\\"\\s*:\\s*\\\"").findAll(body).count()
+        } catch (e: Exception) {
+            0
+        }
+    }
+
+    fun setTyping(sender: String, receiver: String, isTyping: Boolean): Boolean {
+        val c = conn("${Supabase.URL}/rest/v1/typing")
+        c.requestMethod = "POST"
+        c.setRequestProperty("Prefer", "resolution=merge-duplicates")
+        c.doOutput = true
+        c.outputStream.use { it.write("{\"sender\":\"$sender\",\"receiver\":\"$receiver\",\"is_typing\":$isTyping}".toByteArray()) }
+        return c.responseCode in 200..299
+    }
+
+    fun getTyping(sender: String, receiver: String): Boolean {
+        val c = conn("${Supabase.URL}/rest/v1/typing?sender=eq.$sender&receiver=eq.$receiver")
+        return try {
+            val body = c.inputStream.bufferedReader().readText()
+            body.contains("\"is_typing\":true")
+        } catch (e: Exception) {
+            false
+        }
     }
 
     fun uploadKeyBundle(username: String, identity: String, preKey: String, signedPreKey: String): Boolean {
@@ -142,7 +187,7 @@ object SupabaseApi {
     }
 
     fun listMessages(user: String, peer: String): String {
-        val c = conn("${Supabase.URL}/rest/v1/messages?or=(sender.eq.$user,receiver.eq.$user)&or=(sender.eq.$peer,receiver.eq.$peer)")
+        val c = conn("${Supabase.URL}/rest/v1/messages?select=id,sender,receiver,body,status,delivered_at,read_at&or=(sender.eq.$user,receiver.eq.$user)&or=(sender.eq.$peer,receiver.eq.$peer)")
         return c.inputStream.bufferedReader().readText()
     }
 }

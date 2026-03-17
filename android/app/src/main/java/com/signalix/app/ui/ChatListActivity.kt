@@ -114,6 +114,9 @@ class ChatListActivity : AppCompatActivity() {
                 val row = layoutInflater.inflate(R.layout.item_chat_row, list, false)
                 row.findViewById<android.widget.TextView>(R.id.name).text = c
                 row.findViewById<android.widget.TextView>(R.id.avatar).text = c.first().uppercase()
+                val unread = com.signalix.app.data.SupabaseApi.countUnread(Prefs.getCurrentUser(this), c)
+                val time = row.findViewById<android.widget.TextView>(R.id.time)
+                time.text = if (unread > 0) unread.toString() else ""
                 row.setOnClickListener {
                     val intent = Intent(this, ChatActivity::class.java)
                     intent.putExtra("peer", c)
