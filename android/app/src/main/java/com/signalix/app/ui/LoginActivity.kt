@@ -92,13 +92,16 @@ class LoginActivity : AppCompatActivity() {
     private fun login(username: String, token: String): Pair<Boolean, String?> {
         if (username.isBlank() || token.isBlank()) return false to "Missing username or token"
         return try {
-            val url = URL("${baseUrl}/rest/v1/users?username=eq.$username")
+            val safeUser = java.net.URLEncoder.encode(username, "UTF-8")
+            val url = URL("${baseUrl}/rest/v1/users?select=token&username=eq.$safeUser")
             val conn = url.openConnection() as HttpURLConnection
             conn.requestMethod = "GET"
+            conn.setRequestProperty("Accept", "application/json")
             conn.setRequestProperty("apikey", Supabase.ANON)
             conn.setRequestProperty("Authorization", "Bearer ${Supabase.ANON}")
             val code = conn.responseCode
             if (code != 200) {
+                val err = conn.errorStream?.bufferedReader()?.readText()
                 return false to "Server error ($code)"
             }
             val body = conn.inputStream.bufferedReader().readText()
