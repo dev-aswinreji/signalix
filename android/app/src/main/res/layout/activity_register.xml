@@ -34,13 +34,14 @@
         android:text="Token will appear here"
         android:layout_marginTop="12dp" />
 
-    <Button
+    <ImageButton
         android:id="@+id/copy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Copy token"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginTop="8dp"
-        android:backgroundTint="#4B5563" />
+        android:backgroundTint="#4B5563"
+        android:src="@drawable/ic_copy"
+        android:contentDescription="Copy token" />
 
     <TextView
         android:id="@+id/warning"
