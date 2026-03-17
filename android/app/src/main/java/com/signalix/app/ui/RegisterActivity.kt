@@ -24,7 +24,7 @@ class RegisterActivity : AppCompatActivity() {
         val username = findViewById<EditText>(R.id.username)
         val tokenView = findViewById<TextView>(R.id.token)
         val generate = findViewById<android.widget.Button>(R.id.generate)
-        val copy = findViewById<android.widget.Button>(R.id.copy)
+        val copy = findViewById<android.widget.ImageButton>(R.id.copy)
 
         generate.isEnabled = false
         username.addTextChangedListener(object : android.text.TextWatcher {
