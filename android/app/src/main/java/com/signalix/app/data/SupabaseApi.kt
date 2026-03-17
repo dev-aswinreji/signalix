@@ -26,7 +26,7 @@ object SupabaseApi {
 
     fun searchUsers(prefix: String): String {
         val safe = java.net.URLEncoder.encode(prefix, "UTF-8")
-        val c = conn("${Supabase.URL}/rest/v1/users?select=username&username=ilike.$safe%")
+        val c = conn("${Supabase.URL}/rest/v1/users?select=username&username=ilike.${safe}%25")
         return try {
             if (c.responseCode !in 200..299) return "[]"
             c.inputStream.bufferedReader().readText()
