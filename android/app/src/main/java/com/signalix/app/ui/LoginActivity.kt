@@ -32,6 +32,10 @@ class LoginActivity : AppCompatActivity() {
             remember.isChecked = true
         }
 
+        findViewById<android.widget.ImageButton>(R.id.login_settings).setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
+
         findViewById<android.widget.Button>(R.id.login).setOnClickListener {
             val u = username.text.toString().trim()
             val p = password.text.toString().trim()
