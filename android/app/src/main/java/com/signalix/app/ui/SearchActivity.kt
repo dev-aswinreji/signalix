@@ -19,7 +19,7 @@ class SearchActivity : AppCompatActivity() {
         val query = findViewById<EditText>(R.id.query)
         val results = findViewById<LinearLayout>(R.id.results)
 
-        findViewById<android.widget.ImageButton>(R.id.search_btn).setOnClickListener {
+        findViewById<com.google.android.material.button.MaterialButton>(R.id.search_btn).setOnClickListener {
             val raw = query.text.toString().trim().removePrefix("@").lowercase()
             if (raw.isBlank()) return@setOnClickListener
             Thread {
