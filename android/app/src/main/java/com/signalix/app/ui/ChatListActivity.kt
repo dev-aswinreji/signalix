@@ -14,39 +14,40 @@ class ChatListActivity : AppCompatActivity() {
 
         val list = findViewById<android.widget.LinearLayout>(R.id.chat_list)
         val placeholder = findViewById<android.widget.TextView>(R.id.placeholder)
+        val search = findViewById<android.widget.EditText>(R.id.search)
 
-        findViewById<android.widget.ImageButton>(R.id.settings).setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
+        findViewById<android.widget.ImageButton>(R.id.profile).setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
         }
 
-        findViewById<android.widget.ImageButton>(R.id.logout).setOnClickListener {
-            com.signalix.app.data.Prefs.setRemember(this, false, "", "")
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-        }
-
-        findViewById<android.widget.Button>(R.id.add_contact).setOnClickListener {
-            val input = android.widget.EditText(this)
-            input.hint = "username"
-            android.app.AlertDialog.Builder(this)
-                .setTitle("Send request")
-                .setView(input)
-                .setPositiveButton("Send") { _, _ ->
-                    val u = input.text.toString().trim()
-                    if (u.isNotBlank()) {
-                        Thread {
-                            val me = com.signalix.app.data.Prefs.getCurrentUser(this)
-                            com.signalix.app.data.SupabaseApi.sendRequest(me, u)
-                            runOnUiThread { loadContacts(list, placeholder) }
-                        }.start()
-                    }
+        findViewById<android.widget.ImageButton>(R.id.menu).setOnClickListener {
+            val popup = android.widget.PopupMenu(this, it)
+            popup.menu.add("Settings")
+            popup.menu.add("Logout")
+            popup.setOnMenuItemClickListener { item ->
+                if (item.title == "Settings") {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                } else {
+                    com.signalix.app.data.Prefs.setRemember(this, false, "", "")
+                    startActivity(Intent(this, LoginActivity::class.java))
+                    finish()
                 }
-                .setNegativeButton("Cancel", null)
-                .show()
+                true
+            }
+            popup.show()
+        }
+
+        findViewById<android.widget.ImageButton>(R.id.search_toggle).setOnClickListener {
+            search.visibility = if (search.visibility == android.view.View.GONE) android.view.View.VISIBLE else android.view.View.GONE
+        }
+
+        findViewById<android.widget.ImageButton>(R.id.add_contact).setOnClickListener {
+            startActivity(Intent(this, SearchActivity::class.java))
         }
 
         loadContacts(list, placeholder)
         loadRequests(list)
+        notifyRequests()
     }
 
     private fun loadContacts(list: android.widget.LinearLayout, placeholder: android.widget.TextView) {
@@ -103,6 +104,27 @@ class ChatListActivity : AppCompatActivity() {
                     }
                     list.addView(tv)
                 }
+            }
+        }.start()
+    }
+
+    private fun notifyRequests() {
+        Thread {
+            val me = com.signalix.app.data.Prefs.getCurrentUser(this)
+            val body = com.signalix.app.data.SupabaseApi.listRequests(me)
+            val count = Regex("\\\"id\\\"\\s*:\\\"([^\\\"]+)\\\"").findAll(body).count()
+            if (count > 0) {
+                val nm = getSystemService(android.app.NotificationManager::class.java)
+                val channelId = "requests"
+                if (nm.getNotificationChannel(channelId) == null) {
+                    nm.createNotificationChannel(android.app.NotificationChannel(channelId, "Requests", android.app.NotificationManager.IMPORTANCE_DEFAULT))
+                }
+                val notif = androidx.core.app.NotificationCompat.Builder(this, channelId)
+                    .setContentTitle("New friend request")
+                    .setContentText("You have $count new request(s)")
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .build()
+                nm.notify(1001, notif)
             }
         }.start()
     }

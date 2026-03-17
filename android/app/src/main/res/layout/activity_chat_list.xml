@@ -11,12 +11,21 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
+        <ImageButton
+            android:id="@+id/profile"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_profile"
+            android:contentDescription="Profile"
+            android:backgroundTint="#2A2F3B" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Chats"
             android:textSize="22sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_marginStart="12dp" />
 
         <View
             android:layout_width="0dp"
@@ -24,49 +33,46 @@
             android:layout_weight="1" />
 
         <ImageButton
-            android:id="@+id/settings"
+            android:id="@+id/menu"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_settings"
-            android:contentDescription="Settings"
-            android:backgroundTint="#2A2F3B" />
-
-        <ImageButton
-            android:id="@+id/logout"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_logout"
-            android:contentDescription="Logout"
-            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_more"
+            android:contentDescription="Menu"
             android:backgroundTint="#2A2F3B" />
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/search_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:layout_marginTop="12dp">
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_search" />
+        <ImageButton
+            android:id="@+id/search_toggle"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_search"
+            android:contentDescription="Search"
+            android:backgroundTint="#2A2F3B" />
 
         <EditText
             android:id="@+id/search"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Search" />
+            android:hint="Search friends"
+            android:visibility="gone" />
 
-        <Button
+        <ImageButton
             android:id="@+id/add_contact"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_send"
+            android:contentDescription="New chat"
             android:layout_marginStart="8dp"
-            android:backgroundTint="#4B5563" />
+            android:backgroundTint="#2A2F3B" />
     </LinearLayout>
 
     <LinearLayout
