@@ -69,6 +69,17 @@ class ChatListActivity : AppCompatActivity() {
         notifyRequests()
     }
 
+    override fun onResume() {
+        super.onResume()
+        val list = findViewById<android.widget.LinearLayout>(R.id.chat_list)
+        val placeholder = findViewById<android.widget.TextView>(R.id.placeholder)
+        val requestsHeader = findViewById<android.widget.TextView>(R.id.requests_header)
+        val requestsList = findViewById<android.widget.LinearLayout>(R.id.requests_list)
+        loadContacts(list, placeholder)
+        loadRequests(requestsHeader, requestsList)
+        notifyRequests()
+    }
+
     private fun loadContacts(list: android.widget.LinearLayout, placeholder: android.widget.TextView) {
         Thread {
             val me = com.signalix.app.data.Prefs.getCurrentUser(this)

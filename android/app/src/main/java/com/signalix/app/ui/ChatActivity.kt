@@ -24,6 +24,8 @@ class ChatActivity : AppCompatActivity() {
         peer = intent.getStringExtra("peer") ?: ""
         val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.chat_toolbar)
         toolbar.title = peer
+        toolbar.setNavigationIcon(android.R.drawable.ic_media_previous)
+        toolbar.setNavigationOnClickListener { finish() }
         findViewById<android.widget.ImageButton>(R.id.profile).setOnClickListener {
             val intent = android.content.Intent(this, ProfileActivity::class.java)
             intent.putExtra("user", peer)
@@ -51,16 +53,34 @@ class ChatActivity : AppCompatActivity() {
         Thread {
             val user = Prefs.getCurrentUser(this)
             val body = SupabaseApi.listMessages(user, peer)
+            val currentUser = user
             runOnUiThread {
                 messages.removeAllViews()
-                Regex("\\\"body\\\"\\s*:\\\"([^\\\"]+)\\\"")
-                    .findAll(body)
-                    .forEach {
-                        val text = com.signalix.app.data.SignalManager.decrypt(it.groupValues[1], peer)
-                        val tv = TextView(this)
-                        tv.text = text
-                        messages.addView(tv)
+                val pattern = Regex("\\\"sender\\\"\\s*:\\\"([^\\\"]+)\\\"[\\s\\S]*?\\\"body\\\"\\s*:\\\"([^\\\"]+)\\\"")
+                pattern.findAll(body).forEach { m ->
+                    val sender = m.groupValues[1]
+                    val text = com.signalix.app.data.SignalManager.decrypt(m.groupValues[2], peer)
+                    val row = layoutInflater.inflate(R.layout.item_message, messages, false)
+                    val tv = row.findViewById<TextView>(R.id.text)
+                    val status = row.findViewById<TextView>(R.id.status)
+                    tv.text = text
+                    val params = android.widget.LinearLayout.LayoutParams(
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    if (sender == currentUser) {
+                        params.gravity = android.view.Gravity.END
+                        row.layoutParams = params
+                        row.setBackgroundColor(android.graphics.Color.parseColor("#41533B"))
+                        status.text = "✓✓"
+                    } else {
+                        params.gravity = android.view.Gravity.START
+                        row.layoutParams = params
+                        row.setBackgroundColor(android.graphics.Color.parseColor("#1C222E"))
+                        status.text = ""
                     }
+                    messages.addView(row)
+                }
             }
         }.start()
     }
