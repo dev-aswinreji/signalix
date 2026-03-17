@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.signalix.app.R
+import com.signalix.app.data.Prefs
+import com.signalix.app.data.SupabaseApi
 
 class ChatListActivity : AppCompatActivity() {
     private val contactsCache = mutableListOf<String>()
