@@ -46,14 +46,14 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             Thread {
-                val ok = login(u, p)
+                val (ok, msg) = login(u, p)
                 runOnUiThread {
                     if (ok) {
                         com.signalix.app.data.Prefs.setRemember(this, remember.isChecked, u, p)
                         com.signalix.app.data.Prefs.setCurrentUser(this, u)
                         startActivity(Intent(this, ChatListActivity::class.java))
                     } else {
-                        Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, msg ?: "Login failed", Toast.LENGTH_SHORT).show()
                     }
                 }
             }.start()
@@ -83,19 +83,25 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun login(username: String, token: String): Boolean {
-        if (username.isBlank() || token.isBlank()) return false
+    private fun login(username: String, token: String): Pair<Boolean, String?> {
+        if (username.isBlank() || token.isBlank()) return false to "Missing username or token"
         return try {
             val url = URL("${baseUrl}/rest/v1/users?username=eq.$username")
             val conn = url.openConnection() as HttpURLConnection
             conn.requestMethod = "GET"
             conn.setRequestProperty("apikey", Supabase.ANON)
             conn.setRequestProperty("Authorization", "Bearer ${Supabase.ANON}")
+            val code = conn.responseCode
+            if (code != 200) {
+                return false to "Server error ($code)"
+            }
             val body = conn.inputStream.bufferedReader().readText()
             val saved = Regex("\\\"token\\\"\\s*:\\\"([^\\\"]+)\\\"").find(body)?.groupValues?.get(1)
-            saved == token
+            if (saved == null) return false to "User not found"
+            if (saved != token) return false to "Token mismatch"
+            true to null
         } catch (e: Exception) {
-            false
+            false to "Network error"
         }
     }
 
