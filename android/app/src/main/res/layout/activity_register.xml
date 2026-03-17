@@ -24,6 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Generate UUID token"
+        android:textColor="@color/button_text"
         android:layout_marginTop="12dp"
         android:backgroundTint="#6B7280" />
 
@@ -55,5 +56,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Continue to login"
+        android:textColor="@color/button_text"
         android:layout_marginTop="16dp" />
 </LinearLayout>

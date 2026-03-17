@@ -43,6 +43,12 @@ class LoginActivity : AppCompatActivity() {
             val p = password.text.toString().trim()
             if (u.isBlank()) {
                 username.error = "Username required"
+                Toast.makeText(this, "Username required", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (p.isBlank()) {
+                password.error = "Token required"
+                Toast.makeText(this, "Token required", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             Thread {
@@ -103,6 +109,13 @@ class LoginActivity : AppCompatActivity() {
         } catch (e: Exception) {
             false to "Network error"
         }
+    }
+
+    private fun debugToast(msg: String) {
+        runOnUiThread {
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        }
+    }
     }
 
     private fun applyPalette() {
