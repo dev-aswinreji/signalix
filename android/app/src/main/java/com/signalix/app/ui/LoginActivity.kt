@@ -3,6 +3,7 @@ package com.signalix.app.ui
 import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
+import android.provider.Settings
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.signalix.app.R
@@ -26,6 +27,7 @@ class LoginActivity : AppCompatActivity() {
         val username = findViewById<EditText>(R.id.username)
         val password = findViewById<EditText>(R.id.password)
         val remember = findViewById<android.widget.CheckBox>(R.id.remember)
+        val deviceId = android.provider.Settings.Secure.getString(contentResolver, android.provider.Settings.Secure.ANDROID_ID) ?: "unknown"
 
         val (remembered, userSaved, tokenSaved) = com.signalix.app.data.Prefs.getRemember(this)
         if (remembered) {
@@ -33,6 +35,23 @@ class LoginActivity : AppCompatActivity() {
             password.setText(tokenSaved)
             remember.isChecked = true
         }
+
+        Thread {
+            val session = com.signalix.app.data.SupabaseApi.getSession(deviceId)
+            if (session != null) {
+                val (u, t) = session
+                val found = com.signalix.app.data.SupabaseApi.findUser(u)
+                val saved = Regex("\\\"token\\\"\\s*:\\\"([^\\\"]+)\\\"").find(found ?: "")?.groupValues?.get(1)
+                if (saved == t) {
+                    runOnUiThread {
+                        com.signalix.app.data.Prefs.setRemember(this, true, u, t)
+                        com.signalix.app.data.Prefs.setCurrentUser(this, u)
+                        startActivity(Intent(this, ChatListActivity::class.java))
+                        finish()
+                    }
+                }
+            }
+        }.start()
 
         findViewById<android.widget.ImageButton>(R.id.login_settings).setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
@@ -58,8 +77,7 @@ class LoginActivity : AppCompatActivity() {
                     if (ok) {
                         com.signalix.app.data.Prefs.setRemember(this, remember.isChecked, u, p)
                         com.signalix.app.data.Prefs.setCurrentUser(this, u)
-                        val deviceId = android.provider.Settings.Secure.getString(contentResolver, android.provider.Settings.Secure.ANDROID_ID)
-                        Thread { com.signalix.app.data.SupabaseApi.upsertSession(u, p, deviceId ?: "unknown") }.start()
+                        Thread { com.signalix.app.data.SupabaseApi.upsertSession(u, p, deviceId) }.start()
                         startActivity(Intent(this, ChatListActivity::class.java))
                         finish()
                     } else {

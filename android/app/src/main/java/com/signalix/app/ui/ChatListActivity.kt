@@ -34,6 +34,8 @@ class ChatListActivity : AppCompatActivity() {
                 if (item.title == "Settings") {
                     startActivity(Intent(this, SettingsActivity::class.java))
                 } else {
+                    val deviceId = android.provider.Settings.Secure.getString(contentResolver, android.provider.Settings.Secure.ANDROID_ID) ?: "unknown"
+                    com.signalix.app.data.SupabaseApi.deleteSession(com.signalix.app.data.Prefs.getCurrentUser(this), deviceId)
                     com.signalix.app.data.Prefs.setRemember(this, false, "", "")
                     startActivity(Intent(this, LoginActivity::class.java))
                     finish()

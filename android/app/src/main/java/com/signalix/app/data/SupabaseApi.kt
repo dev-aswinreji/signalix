@@ -68,6 +68,25 @@ object SupabaseApi {
         return c.responseCode in 200..299
     }
 
+    fun getSession(deviceId: String): Pair<String, String>? {
+        val c = conn("${Supabase.URL}/rest/v1/sessions?select=username,token&device_id=eq.$deviceId")
+        return try {
+            if (c.responseCode !in 200..299) return null
+            val body = c.inputStream.bufferedReader().readText()
+            val u = Regex("\\\"username\\\"\\s*:\\\"([^\\\"]+)\\\"").find(body)?.groupValues?.get(1)
+            val t = Regex("\\\"token\\\"\\s*:\\\"([^\\\"]+)\\\"").find(body)?.groupValues?.get(1)
+            if (u != null && t != null) u to t else null
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    fun deleteSession(username: String, deviceId: String): Boolean {
+        val c = conn("${Supabase.URL}/rest/v1/sessions?username=eq.$username&device_id=eq.$deviceId")
+        c.requestMethod = "DELETE"
+        return c.responseCode in 200..299
+    }
+
     fun listContacts(owner: String): String {
         val c = conn("${Supabase.URL}/rest/v1/contacts?owner=eq.$owner")
         return c.inputStream.bufferedReader().readText()
