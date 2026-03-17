@@ -33,9 +33,7 @@
                 android:layout_height="40dp"
                 android:src="@drawable/ic_search"
                 android:contentDescription="Search"
-                android:backgroundTint="@color/surface_container"
-                android:layout_gravity="end"
-                android:layout_marginEnd="48dp" />
+                android:backgroundTint="@color/surface_container" />
 
             <ImageButton
                 android:id="@+id/menu"
@@ -43,8 +41,7 @@
                 android:layout_height="40dp"
                 android:src="@drawable/ic_more"
                 android:contentDescription="Menu"
-                android:backgroundTint="@color/surface_container"
-                android:layout_gravity="end" />
+                android:backgroundTint="@color/surface_container" />
         </com.google.android.material.appbar.MaterialToolbar>
 
         <EditText
@@ -75,7 +72,7 @@
             android:layout_height="wrap_content"
             android:text="No chats"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            app:layout_constraintTop_toBottomOf="@id/search_bar"
+            app:layout_constraintTop_toBottomOf="@id/search"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="16dp" />
 

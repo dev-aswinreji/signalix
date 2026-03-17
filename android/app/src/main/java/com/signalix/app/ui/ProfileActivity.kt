@@ -14,7 +14,7 @@ class ProfileActivity : AppCompatActivity() {
         applyInsets(findViewById(android.R.id.content))
         applyFullscreen(this)
 
-        val user = intent.getStringExtra("user") ?: return
+        val user = intent.getStringExtra("user") ?: Prefs.getCurrentUser(this)
         findViewById<TextView>(R.id.username).text = "@$user"
         findViewById<TextView>(R.id.avatar).text = user.first().uppercase()
 
@@ -30,7 +30,8 @@ class ProfileActivity : AppCompatActivity() {
             val found = SupabaseApi.findUser(user)
             val bioValue = Regex("\\\"bio\\\"\\s*:\\\"([^\\\"]*)\\\"").find(found ?: "")?.groupValues?.get(1)
             runOnUiThread {
-                bioText.text = bioValue ?: "Busy"
+                val safeBio = if (bioValue.isNullOrBlank()) "Busy" else bioValue
+                bioText.text = safeBio
                 if (me == user) {
                     edit.visibility = android.view.View.VISIBLE
                     bio.visibility = android.view.View.GONE
