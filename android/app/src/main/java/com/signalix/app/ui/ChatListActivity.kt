@@ -17,6 +17,8 @@ class ChatListActivity : AppCompatActivity() {
         val list = findViewById<android.widget.LinearLayout>(R.id.chat_list)
         val placeholder = findViewById<android.widget.TextView>(R.id.placeholder)
         val search = findViewById<android.widget.EditText>(R.id.search)
+        val requestsHeader = findViewById<android.widget.TextView>(R.id.requests_header)
+        val requestsList = findViewById<android.widget.LinearLayout>(R.id.requests_list)
 
         findViewById<android.widget.ImageButton>(R.id.profile).setOnClickListener {
             startActivity(Intent(this, ProfileActivity::class.java))
@@ -63,7 +65,7 @@ class ChatListActivity : AppCompatActivity() {
         }
 
         loadContacts(list, placeholder)
-        loadRequests(list)
+        loadRequests(requestsHeader, requestsList)
         notifyRequests()
     }
 
@@ -107,7 +109,7 @@ class ChatListActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadRequests(list: android.widget.LinearLayout) {
+    private fun loadRequests(header: android.widget.TextView, list: android.widget.LinearLayout) {
         Thread {
             val me = com.signalix.app.data.Prefs.getCurrentUser(this)
             val body = com.signalix.app.data.SupabaseApi.listRequests(me)
@@ -116,20 +118,69 @@ class ChatListActivity : AppCompatActivity() {
             val senders = Regex("\\\"sender\\\"\\s*:\\\"([^\\\"]+)\\\"")
                 .findAll(body).map { it.groupValues[1] }.toList()
             runOnUiThread {
+                list.removeAllViews()
+                if (ids.isEmpty()) {
+                    header.visibility = android.view.View.GONE
+                    return@runOnUiThread
+                }
+                header.visibility = android.view.View.VISIBLE
                 ids.zip(senders).forEach { (id, sender) ->
-                    val tv = android.widget.TextView(this)
-                    tv.text = "Request from $sender (tap to accept)"
-                    tv.setPadding(0, 8, 0, 8)
-                    tv.setOnClickListener {
+                    val row = android.widget.LinearLayout(this)
+                    row.orientation = android.widget.LinearLayout.VERTICAL
+                    row.setPadding(0, 12, 0, 12)
+
+                    val title = android.widget.TextView(this)
+                    title.text = "@$sender sent you a friend request"
+                    title.textSize = 15f
+                    title.setOnClickListener {
+                        val intent = Intent(this, ProfileActivity::class.java)
+                        intent.putExtra("user", sender)
+                        startActivity(intent)
+                    }
+
+                    val actions = android.widget.LinearLayout(this)
+                    actions.orientation = android.widget.LinearLayout.HORIZONTAL
+                    actions.setPadding(0, 8, 0, 0)
+
+                    val accept = android.widget.Button(this)
+                    accept.text = "Accept"
+                    accept.setOnClickListener {
                         Thread {
                             com.signalix.app.data.SupabaseApi.acceptRequest(id)
                             com.signalix.app.data.SupabaseApi.addContact(me, sender)
                             runOnUiThread {
-                                loadContacts(list, findViewById(R.id.placeholder))
+                                loadContacts(findViewById(R.id.chat_list), findViewById(R.id.placeholder))
+                                loadRequests(header, list)
                             }
                         }.start()
                     }
-                    list.addView(tv)
+
+                    val reject = android.widget.Button(this)
+                    reject.text = "Reject"
+                    reject.setOnClickListener {
+                        Thread {
+                            com.signalix.app.data.SupabaseApi.rejectRequest(id)
+                            runOnUiThread { loadRequests(header, list) }
+                        }.start()
+                    }
+
+                    val block = android.widget.Button(this)
+                    block.text = "Block"
+                    block.setOnClickListener {
+                        Thread {
+                            com.signalix.app.data.SupabaseApi.blockUser(me, sender)
+                            com.signalix.app.data.SupabaseApi.rejectRequest(id)
+                            runOnUiThread { loadRequests(header, list) }
+                        }.start()
+                    }
+
+                    actions.addView(accept)
+                    actions.addView(reject)
+                    actions.addView(block)
+
+                    row.addView(title)
+                    row.addView(actions)
+                    list.addView(row)
                 }
             }
         }.start()
@@ -148,7 +199,7 @@ class ChatListActivity : AppCompatActivity() {
                 }
                 val notif = androidx.core.app.NotificationCompat.Builder(this, channelId)
                     .setContentTitle("New friend request")
-                    .setContentText("You have $count new request(s)")
+                    .setContentText("You have $count new request(s). Open Signalix to respond.")
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .build()
                 nm.notify(1001, notif)

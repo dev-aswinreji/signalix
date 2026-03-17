@@ -69,6 +69,22 @@ object SupabaseApi {
         return c.responseCode in 200..299
     }
 
+    fun rejectRequest(id: String): Boolean {
+        val c = conn("${Supabase.URL}/rest/v1/requests?id=eq.$id")
+        c.requestMethod = "PATCH"
+        c.doOutput = true
+        c.outputStream.use { it.write("{\"status\":\"rejected\"}".toByteArray()) }
+        return c.responseCode in 200..299
+    }
+
+    fun blockUser(owner: String, blocked: String): Boolean {
+        val c = conn("${Supabase.URL}/rest/v1/blocked")
+        c.requestMethod = "POST"
+        c.doOutput = true
+        c.outputStream.use { it.write("{\"owner\":\"$owner\",\"blocked\":\"$blocked\"}".toByteArray()) }
+        return c.responseCode in 200..299
+    }
+
     fun updateBio(username: String, bio: String): Boolean {
         val c = conn("${Supabase.URL}/rest/v1/users?username=eq.$username")
         c.requestMethod = "PATCH"

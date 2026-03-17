@@ -25,7 +25,8 @@
                 android:layout_height="40dp"
                 android:src="@drawable/ic_profile"
                 android:contentDescription="Profile"
-                android:backgroundTint="@color/surface_container" />
+                android:backgroundTint="@color/surface_container"
+                android:layout_gravity="start" />
 
             <ImageButton
                 android:id="@+id/search_toggle"
@@ -33,7 +34,9 @@
                 android:layout_height="40dp"
                 android:src="@drawable/ic_search"
                 android:contentDescription="Search"
-                android:backgroundTint="@color/surface_container" />
+                android:backgroundTint="@color/surface_container"
+                android:layout_gravity="end"
+                android:layout_marginEnd="8dp" />
 
             <ImageButton
                 android:id="@+id/menu"
@@ -41,7 +44,8 @@
                 android:layout_height="40dp"
                 android:src="@drawable/ic_more"
                 android:contentDescription="Menu"
-                android:backgroundTint="@color/surface_container" />
+                android:backgroundTint="@color/surface_container"
+                android:layout_gravity="end" />
         </com.google.android.material.appbar.MaterialToolbar>
 
         <EditText
@@ -56,11 +60,37 @@
             android:layout_marginTop="12dp" />
 
         <LinearLayout
+            android:id="@+id/requests_section"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/search"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/requests_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Requests"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/requests_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/chat_list"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@id/search"
+            app:layout_constraintTop_toBottomOf="@id/requests_section"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -72,7 +102,7 @@
             android:layout_height="wrap_content"
             android:text="No chats"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            app:layout_constraintTop_toBottomOf="@id/search"
+            app:layout_constraintTop_toBottomOf="@id/requests_section"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="16dp" />
 
