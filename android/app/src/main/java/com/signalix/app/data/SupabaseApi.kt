@@ -43,6 +43,31 @@ object SupabaseApi {
         return c.responseCode in 200..299
     }
 
+    fun listBlocked(owner: String): String {
+        val c = conn("${Supabase.URL}/rest/v1/blocked?owner=eq.$owner")
+        return c.inputStream.bufferedReader().readText()
+    }
+
+    fun hasContact(owner: String, contact: String): Boolean {
+        val c = conn("${Supabase.URL}/rest/v1/contacts?owner=eq.$owner&contact=eq.$contact")
+        return try {
+            if (c.responseCode !in 200..299) return false
+            val body = c.inputStream.bufferedReader().readText()
+            body.contains("\"contact\"")
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    fun upsertSession(username: String, token: String, deviceId: String): Boolean {
+        val c = conn("${Supabase.URL}/rest/v1/sessions")
+        c.requestMethod = "POST"
+        c.setRequestProperty("Prefer", "resolution=merge-duplicates")
+        c.doOutput = true
+        c.outputStream.use { it.write("{\"username\":\"$username\",\"token\":\"$token\",\"device_id\":\"$deviceId\"}".toByteArray()) }
+        return c.responseCode in 200..299
+    }
+
     fun listContacts(owner: String): String {
         val c = conn("${Supabase.URL}/rest/v1/contacts?owner=eq.$owner")
         return c.inputStream.bufferedReader().readText()

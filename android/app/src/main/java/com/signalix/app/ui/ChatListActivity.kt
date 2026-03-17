@@ -73,9 +73,13 @@ class ChatListActivity : AppCompatActivity() {
         Thread {
             val me = com.signalix.app.data.Prefs.getCurrentUser(this)
             val body = com.signalix.app.data.SupabaseApi.listContacts(me)
+            val blockedBody = com.signalix.app.data.SupabaseApi.listBlocked(me)
+            val blocked = Regex("\\\"blocked\\\"\\s*:\\\"([^\\\"]+)\\\"")
+                .findAll(blockedBody).map { it.groupValues[1] }.toSet()
             val contacts = Regex("\\\"contact\\\"\\s*:\\\"([^\\\"]+)\\\"")
                 .findAll(body)
                 .map { it.groupValues[1] }
+                .filter { it !in blocked }
                 .toList()
             runOnUiThread {
                 contactsCache.clear()
@@ -148,6 +152,7 @@ class ChatListActivity : AppCompatActivity() {
                         Thread {
                             com.signalix.app.data.SupabaseApi.acceptRequest(id)
                             com.signalix.app.data.SupabaseApi.addContact(me, sender)
+                            com.signalix.app.data.SupabaseApi.addContact(sender, me)
                             runOnUiThread {
                                 loadContacts(findViewById(R.id.chat_list), findViewById(R.id.placeholder))
                                 loadRequests(header, list)

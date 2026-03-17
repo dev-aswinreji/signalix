@@ -26,7 +26,7 @@ class ChatActivity : AppCompatActivity() {
         toolbar.title = peer
         findViewById<android.widget.ImageButton>(R.id.profile).setOnClickListener {
             val intent = android.content.Intent(this, ProfileActivity::class.java)
-            intent.putExtra("user", Prefs.getCurrentUser(this))
+            intent.putExtra("user", peer)
             startActivity(intent)
         }
         messages = findViewById(R.id.messages)

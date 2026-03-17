@@ -58,6 +58,8 @@ class LoginActivity : AppCompatActivity() {
                     if (ok) {
                         com.signalix.app.data.Prefs.setRemember(this, remember.isChecked, u, p)
                         com.signalix.app.data.Prefs.setCurrentUser(this, u)
+                        val deviceId = android.provider.Settings.Secure.getString(contentResolver, android.provider.Settings.Secure.ANDROID_ID)
+                        Thread { com.signalix.app.data.SupabaseApi.upsertSession(u, p, deviceId ?: "unknown") }.start()
                         startActivity(Intent(this, ChatListActivity::class.java))
                         finish()
                     } else {

@@ -67,5 +67,22 @@ class ProfileActivity : AppCompatActivity() {
             request.text = "Request sent"
             request.isEnabled = false
         }
+
+        if (me != user) {
+            Thread {
+                val has = SupabaseApi.hasContact(me, user)
+                runOnUiThread {
+                    if (has) {
+                        request.text = "Chat"
+                        request.isEnabled = true
+                        request.setOnClickListener {
+                            val intent = android.content.Intent(this, ChatActivity::class.java)
+                            intent.putExtra("peer", user)
+                            startActivity(intent)
+                        }
+                    }
+                }
+            }.start()
+        }
     }
 }
