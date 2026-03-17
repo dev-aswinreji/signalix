@@ -111,6 +111,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:text=""
+        android:textColor="@color/button_text"
         app:icon="@drawable/ic_send" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
