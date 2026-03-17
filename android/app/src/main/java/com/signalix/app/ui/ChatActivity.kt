@@ -1,0 +1,59 @@
+package com.signalix.app.ui
+
+import android.os.Bundle
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import com.signalix.app.R
+import com.signalix.app.data.Prefs
+import com.signalix.app.data.SupabaseApi
+import java.util.Base64
+
+class ChatActivity : AppCompatActivity() {
+    private lateinit var messages: LinearLayout
+    private lateinit var input: EditText
+    private lateinit var peer: String
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_chat)
+
+        peer = intent.getStringExtra("peer") ?: ""
+        findViewById<TextView>(R.id.title).text = peer
+        messages = findViewById(R.id.messages)
+        input = findViewById(R.id.input)
+
+        findViewById<android.widget.Button>(R.id.send).setOnClickListener {
+            val text = input.text.toString().trim()
+            if (text.isBlank()) return@setOnClickListener
+            Thread {
+                val user = Prefs.getCurrentUser(this)
+                val enc = Base64.getEncoder().encodeToString(text.toByteArray())
+                SupabaseApi.sendMessage(user, peer, enc)
+                runOnUiThread { input.setText("") }
+                loadMessages()
+            }.start()
+        }
+
+        loadMessages()
+    }
+
+    private fun loadMessages() {
+        Thread {
+            val user = Prefs.getCurrentUser(this)
+            val body = SupabaseApi.listMessages(user, peer)
+            runOnUiThread {
+                messages.removeAllViews()
+                Regex("\\\"body\\\"\\s*:\\\"([^\\\"]+)\\\"")
+                    .findAll(body)
+                    .forEach {
+                        val text = String(Base64.getDecoder().decode(it.groupValues[1]))
+                        val tv = TextView(this)
+                        tv.text = text
+                        messages.addView(tv)
+                    }
+            }
+        }.start()
+    }
+}

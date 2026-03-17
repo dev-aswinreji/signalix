@@ -48,6 +48,7 @@ class LoginActivity : AppCompatActivity() {
                 runOnUiThread {
                     if (ok) {
                         com.signalix.app.data.Prefs.setRemember(this, remember.isChecked, u, p)
+                        com.signalix.app.data.Prefs.setCurrentUser(this, u)
                         startActivity(Intent(this, ChatListActivity::class.java))
                     } else {
                         Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()

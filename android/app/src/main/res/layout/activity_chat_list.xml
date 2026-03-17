@@ -61,6 +61,21 @@
             android:hint="Search" />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/add_contact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add contact"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#4B5563" />
+
+    <LinearLayout
+        android:id="@+id/chat_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="12dp" />
+
     <TextView
         android:id="@+id/placeholder"
         android:layout_width="wrap_content"

@@ -10,6 +10,7 @@ object Prefs {
     private const val KEY_REMEMBER = "remember"
     private const val KEY_USER = "user"
     private const val KEY_TOKEN = "token"
+    private const val KEY_CURRENT = "current_user"
 
     fun setTheme(context: Context, dark: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -55,4 +56,13 @@ object Prefs {
         val token = prefs.getString(KEY_TOKEN, "") ?: ""
         return Triple(remember, user, token)
     }
+
+    fun setCurrentUser(context: Context, user: String) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit().putString(KEY_CURRENT, user).apply()
+    }
+
+    fun getCurrentUser(context: Context): String =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getString(KEY_CURRENT, "") ?: ""
 }
