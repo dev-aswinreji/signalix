@@ -36,8 +36,8 @@ object Prefs {
 
     fun getServer(context: Context): String =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getString(KEY_SERVER, "https://signalix-backend-production.up.railway.app")
-            ?: "https://signalix-backend-production.up.railway.app"
+            .getString(KEY_SERVER, "https://mhrcfdxelbmiuabvarrg.supabase.co")
+            ?: "https://mhrcfdxelbmiuabvarrg.supabase.co"
 
     fun setRemember(context: Context, remember: Boolean, user: String, token: String) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)

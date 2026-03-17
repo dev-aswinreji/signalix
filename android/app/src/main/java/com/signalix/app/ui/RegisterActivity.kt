@@ -8,8 +8,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.signalix.app.R
 import com.signalix.app.data.Prefs
+import com.signalix.app.data.Supabase
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.UUID
 
 class RegisterActivity : AppCompatActivity() {
     private val baseUrl: String
@@ -59,17 +61,21 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun register(username: String): Pair<String?, String?> {
         return try {
-            val url = URL("$baseUrl/register")
+            val token = UUID.randomUUID().toString()
+            val url = URL("${baseUrl}/rest/v1/users")
             val conn = url.openConnection() as HttpURLConnection
             conn.requestMethod = "POST"
             conn.setRequestProperty("Content-Type", "application/json")
+            conn.setRequestProperty("apikey", Supabase.ANON)
+            conn.setRequestProperty("Authorization", "Bearer ${Supabase.ANON}")
+            conn.setRequestProperty("Prefer", "return=representation")
             conn.doOutput = true
-            conn.outputStream.use { it.write("{\"username\":\"$username\"}".toByteArray()) }
+            conn.outputStream.use {
+                it.write("{\"username\":\"$username\",\"token\":\"$token\"}".toByteArray())
+            }
             val code = conn.responseCode
-            if (code == 409) return null to "Username already taken"
-            if (code != 200) return null to "Server error ($code)"
-            val body = conn.inputStream.bufferedReader().readText()
-            val token = Regex("\\\"token\\\"\\s*:\\\"([^\\\"]+)\\\"").find(body)?.groupValues?.get(1)
+            if (code == 409 || code == 400) return null to "Username already taken"
+            if (code !in 200..299) return null to "Server error ($code)"
             token to null
         } catch (e: Exception) {
             null to "Network error"

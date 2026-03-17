@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.signalix.app.R
 import com.signalix.app.data.Prefs
+import com.signalix.app.data.Supabase
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -78,13 +79,14 @@ class LoginActivity : AppCompatActivity() {
     private fun login(username: String, token: String): Boolean {
         if (username.isBlank() || token.isBlank()) return false
         return try {
-            val url = URL("$baseUrl/login")
+            val url = URL("${baseUrl}/rest/v1/users?username=eq.$username")
             val conn = url.openConnection() as HttpURLConnection
-            conn.requestMethod = "POST"
-            conn.setRequestProperty("Content-Type", "application/json")
-            conn.doOutput = true
-            conn.outputStream.use { it.write("{\"username\":\"$username\",\"token\":\"$token\"}".toByteArray()) }
-            conn.responseCode == 200
+            conn.requestMethod = "GET"
+            conn.setRequestProperty("apikey", Supabase.ANON)
+            conn.setRequestProperty("Authorization", "Bearer ${Supabase.ANON}")
+            val body = conn.inputStream.bufferedReader().readText()
+            val saved = Regex("\\\"token\\\"\\s*:\\\"([^\\\"]+)\\\"").find(body)?.groupValues?.get(1)
+            saved == token
         } catch (e: Exception) {
             false
         }
