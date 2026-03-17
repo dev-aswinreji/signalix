@@ -29,7 +29,7 @@ class ChatActivity : AppCompatActivity() {
             if (text.isBlank()) return@setOnClickListener
             Thread {
                 val user = Prefs.getCurrentUser(this)
-                val enc = Base64.getEncoder().encodeToString(text.toByteArray())
+                val enc = com.signalix.app.data.SignalManager.encrypt(text, peer)
                 SupabaseApi.sendMessage(user, peer, enc)
                 runOnUiThread { input.setText("") }
                 loadMessages()
@@ -48,7 +48,7 @@ class ChatActivity : AppCompatActivity() {
                 Regex("\\\"body\\\"\\s*:\\\"([^\\\"]+)\\\"")
                     .findAll(body)
                     .forEach {
-                        val text = String(Base64.getDecoder().decode(it.groupValues[1]))
+                        val text = com.signalix.app.data.SignalManager.decrypt(it.groupValues[1], peer)
                         val tv = TextView(this)
                         tv.text = text
                         messages.addView(tv)

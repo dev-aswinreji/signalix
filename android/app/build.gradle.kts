@@ -11,8 +11,8 @@ android {
         applicationId = "com.signalix.app"
         minSdk = 35
         targetSdk = 35
-        versionCode = 12
-        versionName = "1.4.0"
+        versionCode = 13
+        versionName = "1.5.0"
     }
 
     buildTypes {
@@ -40,4 +40,5 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.preference:preference-ktx:1.2.1")
+    implementation("org.signal:libsignal-client:0.86.5")
 }

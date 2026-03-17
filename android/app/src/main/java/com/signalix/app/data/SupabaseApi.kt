@@ -39,6 +39,21 @@ object SupabaseApi {
         return c.responseCode in 200..299
     }
 
+    fun uploadKeyBundle(username: String, identity: String, preKey: String, signedPreKey: String): Boolean {
+        val c = conn("${Supabase.URL}/rest/v1/key_bundles")
+        c.requestMethod = "POST"
+        c.doOutput = true
+        c.outputStream.use {
+            it.write("{\"username\":\"$username\",\"identity\":\"$identity\",\"prekey\":\"$preKey\",\"signed_prekey\":\"$signedPreKey\"}".toByteArray())
+        }
+        return c.responseCode in 200..299
+    }
+
+    fun getKeyBundle(username: String): String {
+        val c = conn("${Supabase.URL}/rest/v1/key_bundles?username=eq.$username")
+        return c.inputStream.bufferedReader().readText()
+    }
+
     fun listMessages(user: String, peer: String): String {
         val c = conn("${Supabase.URL}/rest/v1/messages?or=(sender.eq.$user,receiver.eq.$user)&or=(sender.eq.$peer,receiver.eq.$peer)")
         return c.inputStream.bufferedReader().readText()
