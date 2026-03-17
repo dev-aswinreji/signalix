@@ -9,18 +9,18 @@ import com.signalix.app.R
 import com.signalix.app.data.Prefs
 import com.signalix.app.data.SupabaseApi
 import java.util.Base64
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.postgresChangeFlow
 
 class ChatActivity : AppCompatActivity() {
     private lateinit var messages: LinearLayout
     private lateinit var input: EditText
     private lateinit var peer: String
-    private val handler = android.os.Handler(android.os.Looper.getMainLooper())
-    private val refreshRunnable = object : Runnable {
-        override fun run() {
-            loadMessages()
-            handler.postDelayed(this, 2000)
-        }
-    }
+    private lateinit var supabase: io.github.jan.supabase.SupabaseClient
+    private var realtimeJob: kotlinx.coroutines.Job? = null
+    private var realtimeChannel: io.github.jan.supabase.realtime.RealtimeChannel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,8 +31,15 @@ class ChatActivity : AppCompatActivity() {
         peer = intent.getStringExtra("peer") ?: ""
         val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.chat_toolbar)
         toolbar.title = peer
-        toolbar.setNavigationIcon(android.R.drawable.ic_media_previous)
+        toolbar.setNavigationIcon(androidx.appcompat.R.drawable.abc_ic_ab_back_material)
         toolbar.setNavigationOnClickListener { finish() }
+
+        supabase = io.github.jan.supabase.createSupabaseClient(
+            com.signalix.app.data.Supabase.URL,
+            com.signalix.app.data.Supabase.ANON
+        ) {
+            install(io.github.jan.supabase.realtime.Realtime)
+        }
         findViewById<android.widget.ImageButton>(R.id.profile).setOnClickListener {
             val intent = android.content.Intent(this, ProfileActivity::class.java)
             intent.putExtra("user", peer)
@@ -58,12 +65,12 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        handler.post(refreshRunnable)
+        startRealtime()
     }
 
     override fun onPause() {
         super.onPause()
-        handler.removeCallbacks(refreshRunnable)
+        stopRealtime()
     }
 
     private fun loadMessages() {
@@ -100,5 +107,30 @@ class ChatActivity : AppCompatActivity() {
                 }
             }
         }.start()
+    }
+
+    private fun startRealtime() {
+        stopRealtime()
+        val currentUser = Prefs.getCurrentUser(this)
+        val channel = supabase.channel("chat-$currentUser-$peer")
+        realtimeChannel = channel
+        realtimeJob = lifecycleScope.launch {
+            val flow = channel.postgresChangeFlow<io.github.jan.supabase.realtime.PostgresAction.Insert>(
+                schema = "public"
+            )
+            channel.subscribe()
+            flow.collect {
+                loadMessages()
+            }
+        }
+    }
+
+    private fun stopRealtime() {
+        realtimeJob?.cancel()
+        realtimeJob = null
+        realtimeChannel?.let { ch ->
+            lifecycleScope.launch { ch.unsubscribe() }
+        }
+        realtimeChannel = null
     }
 }
