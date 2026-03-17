@@ -22,7 +22,8 @@ class ChatActivity : AppCompatActivity() {
         applyFullscreen(this)
 
         peer = intent.getStringExtra("peer") ?: ""
-        findViewById<TextView>(R.id.title).text = peer
+        val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.chat_toolbar)
+        toolbar.title = peer
         findViewById<android.widget.ImageButton>(R.id.profile).setOnClickListener {
             val intent = android.content.Intent(this, ProfileActivity::class.java)
             intent.putExtra("user", Prefs.getCurrentUser(this))
