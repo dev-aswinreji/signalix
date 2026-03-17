@@ -13,14 +13,26 @@ object SupabaseApi {
     }
 
     fun findUser(username: String): String? {
-        val c = conn("${Supabase.URL}/rest/v1/users?username=eq.$username")
-        val body = c.inputStream.bufferedReader().readText()
-        return if (body.contains("\"username\"")) body else null
+        val safe = java.net.URLEncoder.encode(username, "UTF-8")
+        val c = conn("${Supabase.URL}/rest/v1/users?select=username,token&username=eq.$safe")
+        return try {
+            if (c.responseCode !in 200..299) return null
+            val body = c.inputStream.bufferedReader().readText()
+            if (body.contains("\"username\"")) body else null
+        } catch (e: Exception) {
+            null
+        }
     }
 
     fun searchUsers(prefix: String): String {
-        val c = conn("${Supabase.URL}/rest/v1/users?username=ilike.${prefix}%")
-        return c.inputStream.bufferedReader().readText()
+        val safe = java.net.URLEncoder.encode(prefix, "UTF-8")
+        val c = conn("${Supabase.URL}/rest/v1/users?select=username&username=ilike.$safe%")
+        return try {
+            if (c.responseCode !in 200..299) return "[]"
+            c.inputStream.bufferedReader().readText()
+        } catch (e: Exception) {
+            "[]"
+        }
     }
 
     fun addContact(owner: String, contact: String): Boolean {
