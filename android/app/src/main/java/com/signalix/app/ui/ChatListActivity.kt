@@ -45,6 +45,10 @@ class ChatListActivity : AppCompatActivity() {
             startActivity(Intent(this, SearchActivity::class.java))
         }
 
+        findViewById<android.widget.ImageButton>(R.id.new_chat_fab).setOnClickListener {
+            startActivity(Intent(this, SearchActivity::class.java))
+        }
+
         loadContacts(list, placeholder)
         loadRequests(list)
         notifyRequests()
