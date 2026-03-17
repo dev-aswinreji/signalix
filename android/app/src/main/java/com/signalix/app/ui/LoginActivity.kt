@@ -59,6 +59,7 @@ class LoginActivity : AppCompatActivity() {
                         com.signalix.app.data.Prefs.setRemember(this, remember.isChecked, u, p)
                         com.signalix.app.data.Prefs.setCurrentUser(this, u)
                         startActivity(Intent(this, ChatListActivity::class.java))
+                        finish()
                     } else {
                         Toast.makeText(this, msg ?: "Login failed", Toast.LENGTH_SHORT).show()
                     }

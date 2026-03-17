@@ -68,6 +68,7 @@ class RegisterActivity : AppCompatActivity() {
 
         findViewById<android.widget.Button>(R.id.continue_login).setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
+            finish()
         }
     }
 
