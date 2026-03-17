@@ -4,4 +4,6 @@
     <color name="palette_primary_alt">#06B6D4</color>
     <color name="palette_secondary_alt">#F59E0B</color>
     <color name="ic_launcher_background">#121826</color>
+
+    <color name="surface_container">#1F2937</color>
 </resources>
