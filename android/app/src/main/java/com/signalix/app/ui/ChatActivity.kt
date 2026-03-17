@@ -14,6 +14,13 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var messages: LinearLayout
     private lateinit var input: EditText
     private lateinit var peer: String
+    private val handler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val refreshRunnable = object : Runnable {
+        override fun run() {
+            loadMessages()
+            handler.postDelayed(this, 2000)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +54,16 @@ class ChatActivity : AppCompatActivity() {
         }
 
         loadMessages()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        handler.post(refreshRunnable)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        handler.removeCallbacks(refreshRunnable)
     }
 
     private fun loadMessages() {
