@@ -39,6 +39,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         findViewById<android.widget.Button>(R.id.login).setOnClickListener {
+            Toast.makeText(this, "LOGIN CLICKED", Toast.LENGTH_SHORT).show()
             val u = username.text.toString().trim()
             val p = password.text.toString().trim()
             if (u.isBlank()) {
@@ -66,6 +67,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         findViewById<android.widget.Button>(R.id.register).setOnClickListener {
+            Toast.makeText(this, "REGISTER CLICKED", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this, RegisterActivity::class.java))
         }
     }
