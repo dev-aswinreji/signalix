@@ -64,15 +64,15 @@ class ChatListActivity : AppCompatActivity() {
                 } else {
                     placeholder.visibility = android.view.View.GONE
                     contacts.forEach { c ->
-                        val tv = android.widget.TextView(this)
-                        tv.text = c
-                        tv.setPadding(0, 16, 0, 16)
-                        tv.setOnClickListener {
+                        val row = layoutInflater.inflate(R.layout.item_chat_row, list, false)
+                        row.findViewById<android.widget.TextView>(R.id.name).text = c
+                        row.findViewById<android.widget.TextView>(R.id.avatar).text = c.first().uppercase()
+                        row.setOnClickListener {
                             val intent = Intent(this, ChatActivity::class.java)
                             intent.putExtra("peer", c)
                             startActivity(intent)
                         }
-                        list.addView(tv)
+                        list.addView(row)
                     }
                 }
             }
