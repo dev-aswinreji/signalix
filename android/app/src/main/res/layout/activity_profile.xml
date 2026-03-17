@@ -21,21 +21,29 @@
         android:textSize="20sp"
         android:layout_marginTop="12dp" />
 
+    <TextView
+        android:id="@+id/bio_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bio"
+        android:layout_marginTop="12dp" />
+
     <EditText
         android:id="@+id/bio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Bio"
-        android:layout_marginTop="12dp" />
+        android:layout_marginTop="12dp"
+        android:visibility="gone" />
 
-    <ImageButton
-        android:id="@+id/request"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/ic_send"
-        android:contentDescription="Send request"
-        android:backgroundTint="#2A2F3B" />
+    <Button
+        android:id="@+id/edit_bio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit bio"
+        android:textColor="@color/button_text"
+        android:layout_marginTop="12dp"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/save_bio"
@@ -43,5 +51,15 @@
         android:layout_height="wrap_content"
         android:text="Save bio"
         android:textColor="@color/button_text"
-        android:layout_marginTop="12dp" />
+        android:layout_marginTop="12dp"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/request"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send friend request"
+        android:textColor="@color/button_text"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
 </LinearLayout>

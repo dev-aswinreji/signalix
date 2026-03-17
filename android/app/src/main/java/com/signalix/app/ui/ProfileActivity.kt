@@ -18,32 +18,53 @@ class ProfileActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.username).text = "@$user"
         findViewById<TextView>(R.id.avatar).text = user.first().uppercase()
 
+        val bioText = findViewById<TextView>(R.id.bio_text)
         val bio = findViewById<android.widget.EditText>(R.id.bio)
+        val edit = findViewById<android.widget.Button>(R.id.edit_bio)
         val save = findViewById<android.widget.Button>(R.id.save_bio)
-        val request = findViewById<android.widget.ImageButton>(R.id.request)
+        val request = findViewById<android.widget.Button>(R.id.request)
 
         val me = Prefs.getCurrentUser(this)
-        if (me == user) {
-            request.visibility = android.view.View.GONE
-        }
 
         Thread {
             val found = SupabaseApi.findUser(user)
             val bioValue = Regex("\\\"bio\\\"\\s*:\\\"([^\\\"]*)\\\"").find(found ?: "")?.groupValues?.get(1)
-            runOnUiThread { if (bioValue != null) bio.setText(bioValue) }
+            runOnUiThread {
+                bioText.text = bioValue ?: "Busy"
+                if (me == user) {
+                    edit.visibility = android.view.View.VISIBLE
+                    bio.visibility = android.view.View.GONE
+                    save.visibility = android.view.View.GONE
+                } else {
+                    request.visibility = android.view.View.VISIBLE
+                }
+            }
         }.start()
+
+        edit.setOnClickListener {
+            bio.setText(bioText.text)
+            bio.visibility = android.view.View.VISIBLE
+            save.visibility = android.view.View.VISIBLE
+            edit.visibility = android.view.View.GONE
+        }
 
         save.setOnClickListener {
             val text = bio.text.toString()
             Thread {
                 SupabaseApi.updateBio(user, text)
             }.start()
+            bioText.text = text
+            bio.visibility = android.view.View.GONE
+            save.visibility = android.view.View.GONE
+            edit.visibility = android.view.View.VISIBLE
         }
 
         request.setOnClickListener {
             Thread {
                 SupabaseApi.sendRequest(Prefs.getCurrentUser(this), user)
             }.start()
+            request.text = "Request sent"
+            request.isEnabled = false
         }
     }
 }
